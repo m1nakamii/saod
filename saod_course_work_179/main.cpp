@@ -1,6 +1,5 @@
 #include <cstdio>
 #include <cstring>
-#include <fstream>
 #include <iostream>
 
 using namespace std;
@@ -60,7 +59,6 @@ void mergeSort(Record arr[], int left, int right) {
 }
 
 int main() {
-
   FILE *fp;
   fp = fopen("testBase1.dat", "rb");
 
@@ -68,15 +66,29 @@ int main() {
     cerr << "Ошибка при открытии файла." << endl;
     return 1;
   }
-  Record tt[4000] = {0};
-  int i = fread((Record *)tt, sizeof(Record), 4000, fp);
 
-  mergeSort(tt, 0, i - 1);
+  fseek(fp, 0, SEEK_END);
+  long fileSize = ftell(fp);
+  int numRecords = fileSize / sizeof(Record);
 
-  for (int i = 0; i < 4000; ++i)
-    cout << tt[i].author << "\t" << tt[i].title << "\t" << tt[i].publisher
-         << "\t" << tt[i].year << "\t" << tt[i].num_of_page << endl;
-  cout << "Прочитано записей: " << i << endl;
+  rewind(fp);
+
+  Record *records = new Record[numRecords];
+
+  fread(records, sizeof(Record), numRecords, fp);
+
   fclose(fp);
+
+  mergeSort(records, 0, numRecords - 1);
+
+  // Вывод отсортированных записей
+  for (int i = 0; i < numRecords; i++) {
+    cout << records[i].author << "\t" << records[i].title << "\t"
+         << records[i].publisher << "\t" << records[i].year << "\t"
+         << records[i].num_of_page << endl;
+  }
+
+  delete[] records;
+
   return 0;
 }

@@ -1,113 +1,77 @@
 #include <iostream>
 
-// Структура узла дерева
-struct TreeNode {
+struct Node {
   int data;
-  TreeNode *left;
-  TreeNode *right;
+  Node *left;
+  Node *right;
+
+  Node(int value) : data(value), left(nullptr), right(nullptr) {}
 };
 
-// Создание нового узла
-TreeNode *createNode(int data) {
-  TreeNode *newNode = new TreeNode;
-  newNode->data = data;
-  newNode->left = nullptr;
-  newNode->right = nullptr;
-  return newNode;
-}
-
-// Функция для добавления узла в дерево
-TreeNode *insert(TreeNode *root, int data) {
+Node *insert(Node *root, int data) {
   if (root == nullptr) {
-    return createNode(data);
+    return new Node(data);
+  } else {
+    if (data <= root->data) {
+      root->left = insert(root->left, data);
+    } else {
+      root->right = insert(root->right, data);
+    }
   }
-
-  if (data < root->data) {
-    root->left = insert(root->left, data);
-  } else if (data > root->data) {
-    root->right = insert(root->right, data);
-  }
-
   return root;
 }
 
-// Обходы дерева
-void inorderTraversal(TreeNode *root) {
-  if (root == nullptr)
-    return;
-  inorderTraversal(root->left);
-  std::cout << root->data << " ";
-  inorderTraversal(root->right);
+// Обход слева направо (pre-order)
+void leftright(Node *root) {
+  if (root != nullptr) {
+    std::cout << root->data << " ";
+    leftright(root->left);
+    leftright(root->right);
+  }
 }
 
-void preorderTraversal(TreeNode *root) {
-  if (root == nullptr)
-    return;
-  std::cout << root->data << " ";
-  preorderTraversal(root->left);
-  preorderTraversal(root->right);
+// Обход сверху вниз (in order)
+void updown(Node *root) {
+  if (root != nullptr) {
+    updown(root->left);
+    std::cout << root->data << " ";
+    updown(root->right);
+  }
 }
 
-void postorderTraversal(TreeNode *root) {
-  if (root == nullptr)
-    return;
-  postorderTraversal(root->left);
-  postorderTraversal(root->right);
-  std::cout << root->data << " ";
-}
-
-// Вычисление размера дерева
-int treeSize(TreeNode *root) {
-  if (root == nullptr)
-    return 0;
-  return 1 + treeSize(root->left) + treeSize(root->right);
-}
-
-// Вычисление контрольной суммы
-int treeSum(TreeNode *root) {
-  if (root == nullptr)
-    return 0;
-  return root->data + treeSum(root->left) + treeSum(root->right);
-}
-
-// Вычисление высоты дерева
-int treeHeight(TreeNode *root) {
-  if (root == nullptr)
-    return 0;
-  int leftHeight = treeHeight(root->left);
-  int rightHeight = treeHeight(root->right);
-  return 1 + std::max(leftHeight, rightHeight);
+// Обход снизу вверх (post-order)
+void downup(Node *root) {
+  if (root != nullptr) {
+    downup(root->left);
+    downup(root->right);
+    std::cout << root->data << " ";
+  }
 }
 
 int main() {
-  TreeNode *root = nullptr;
+  Node *root = nullptr;
 
-  // Заполнение дерева данными (замените значениями по вашему выбору)
-  int data[] = {10, 7, 12, 9, 8, 13};
-  int n = sizeof(data) / sizeof(data[0]);
-  for (int i = 0; i < n; ++i) {
-    root = insert(root, data[i]);
-  }
+  // Заполнение дерева данными (3 вариант)
+  root = insert(root, 10);
+  root = insert(root, 5);
+  root = insert(root, 9);
+  root = insert(root, 6);
+  root = insert(root, 7);
+  root = insert(root, 8);
 
-  std::cout << "Обход слева направо: ";
-  inorderTraversal(root);
+  // Вывод обходов дерева
+
+  std::cout << "Обход слева направо (pre order): ";
+  leftright(root);
   std::cout << std::endl;
 
-  std::cout << "Обход сверху вниз: ";
-  preorderTraversal(root);
+  std::cout << "Обход сверху вниз (in order): ";
+  updown(root);
   std::cout << std::endl;
 
-  std::cout << "Обход снизу вверх: ";
-  postorderTraversal(root);
+  std::cout << "Обход снизу вверх (post order): ";
+  downup(root);
   std::cout << std::endl;
-
-  int size = treeSize(root);
-  int sum = treeSum(root);
-  int height = treeHeight(root);
-
-  std::cout << "Размер дерева: " << size << std::endl;
-  std::cout << "Контрольная сумма: " << sum << std::endl;
-  std::cout << "Высота дерева: " << height << std::endl;
 
   return 0;
 }
